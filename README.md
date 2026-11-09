@@ -1,0 +1,2 @@
+# aplikesyon
+Duo proyikto
