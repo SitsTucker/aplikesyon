@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Information System</title>
+    <link rel="stylesheet" href="style (1).css">
+</head>
+<!-- auth-pending hides the page until app.js confirms an admin is logged in -->
+<body class="auth-pending">
+    <div class="user-bar">
+        <span>👤 Signed in as <strong id="user-name"></strong></span>
+        <button type="button" class="btn btn-secondary btn-sm" id="logout-btn">Log out</button>
+    </div>
+
+    <header class="app-header">
+        <h1>🎓 Student Information System</h1>
+        <p class="subtitle">Prototype — data stored in MySQL</p>
+    </header>
+
+    <main class="container">
+        <!-- Form -->
+        <section class="card">
+            <h2 id="form-title">Add New Student</h2>
+            <form id="student-form" autocomplete="off">
+                <input type="hidden" id="student-id">
+
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="name">Full Name *</label>
+                        <input type="text" id="name" required maxlength="100" placeholder="e.g. Juan Dela Cruz">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="age">Age</label>
+                        <input type="number" id="age" min="1" max="120" placeholder="e.g. 19">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="email">Email</label>
+                        <input type="email" id="email" maxlength="150" placeholder="e.g. juan@example.com">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="program">Program *</label>
+                        <select id="program" required>
+                            <option value="">— Select program —</option>
+                            <option value="Computer Science">Computer Science</option>
+                            <option value="Agriculture">Agriculture</option>
+                            <option value="Agri Business">Agri Business</option>
+                            <option value="Food Technology">Food Science</option>
+                            <option value="Education">Education</option>
+                        </select>
+                    </div>
+
+                    <!-- Majors are filtered by Program (data-program) by app.js -->
+                    <div class="form-group" id="sub-program-group" hidden>
+                        <label for="sub-program">Major</label>
+                        <select id="sub-program">
+                            <option value="">— Select major —</option>
+                            <option value="Information Network Systems" data-program="Computer Science">BSCS - Information Network Systems</option>
+                            <option value="Software Engineering" data-program="Computer Science">BSCS - Software Engineering</option>
+                            <option value="Crop Science" data-program="Agriculture">BSA - Crop Science</option>
+                            <option value="Animal Science" data-program="Agriculture">BSA - Animal Science</option>
+                            <option value="BSED - English Major" data-program="Education">BSED - English Major</option>
+                            <option value="BTLED - HE" data-program="Education">BTLED - HE</option>
+                            <option value="BTLED - AFA" data-program="Education">BTLED - AFA</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="year">Year Level</label>
+                        <select id="year">
+                            <option value="1">1st Year</option>
+                            <option value="2">2nd Year</option>
+                            <option value="3">3rd Year</option>
+                            <option value="4">4th Year</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="gpa">GPA</label>
+                        <input type="number" id="gpa" step="0.01" min="0" max="4" placeholder="e.g. 3.50">
+                    </div>
+                </div>
+
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary" id="submit-btn">Add Student</button>
+                    <button type="button" class="btn btn-secondary" id="cancel-btn" hidden>Cancel</button>
+                </div>
+            </form>
+        </section>
+
+        <!-- Search + Table -->
+        <section class="card">
+            <div class="table-header">
+                <h2>Students (<span id="count">0</span>)</h2>
+                <input type="search" id="search" placeholder="🔍 Search by name, email, major...">
+            </div>
+
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Name</th>
+                            <th>Age</th>
+                            <th>Email</th>
+                            <th>Program</th>
+                            <th>Year</th>
+                            <th>GPA</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="student-list">
+                        <tr><td colspan="8" class="empty">Loading students…</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <div class="toolbar">
+            <button class="btn btn-danger" id="clear-btn">🗑️ Clear All Data</button>
+            <button class="btn btn-secondary" id="export-btn">⬇️ Export JSON</button>
+        </div>
+    </main>
+
+    <div id="toast" class="toast"></div>
+
+    <script src="api.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>

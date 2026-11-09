@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Login — Student Information System</title>
+    <link rel="stylesheet" href="style (1).css">
+</head>
+<body>
+    <header class="app-header">
+        <h1>🎓 Student Information System</h1>
+        <p class="subtitle">Admin sign-in</p>
+    </header>
+
+    <main class="login-wrap">
+        <section class="card login-card">
+            <h2 id="login-title">Admin Login</h2>
+            <p class="form-hint" id="login-hint" hidden>
+                No admin account exists yet. Create the first one to get started.
+            </p>
+            <p class="form-error" id="login-error" role="alert" hidden></p>
+
+            <form id="login-form">
+                <div class="form-group">
+                    <label for="username">Username</label>
+                    <input type="text" id="username" required maxlength="50"
+                           autocomplete="username" autofocus>
+                </div>
+
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" required maxlength="72"
+                           autocomplete="current-password">
+                </div>
+
+                <div class="form-group" id="confirm-group" hidden>
+                    <label for="confirm">Confirm password</label>
+                    <input type="password" id="confirm" maxlength="72"
+                           autocomplete="new-password">
+                </div>
+
+                <button type="submit" class="btn btn-primary" id="login-btn">Log in</button>
+            </form>
+        </section>
+    </main>
+
+    <script src="api.js"></script>
+    <script>
+        const ui = {
+            form: document.getElementById('login-form'),
+            title: document.getElementById('login-title'),
+            hint: document.getElementById('login-hint'),
+            error: document.getElementById('login-error'),
+            username: document.getElementById('username'),
+            password: document.getElementById('password'),
+            confirm: document.getElementById('confirm'),
+            confirmGroup: document.getElementById('confirm-group'),
+            btn: document.getElementById('login-btn'),
+        };
+
+        let mode = 'login'; // 'login', or 'setup' while no admin account exists
+
+        function showError(message) {
+            ui.error.textContent = message;
+            ui.error.hidden = !message;
+        }
+
+        function setMode(newMode) {
+            mode = newMode;
+            const setup = mode === 'setup';
+            ui.title.textContent = setup ? 'Create Admin Account' : 'Admin Login';
+            ui.hint.hidden = !setup;
+            ui.confirmGroup.hidden = !setup;
+            ui.confirm.required = setup;
+            ui.password.minLength = setup ? 8 : 0;
+            ui.password.autocomplete = setup ? 'new-password' : 'current-password';
+            ui.btn.textContent = setup ? 'Create account' : 'Log in';
+        }
+
+        ui.form.addEventListener('submit', async e => {
+            e.preventDefault();
+            showError('');
+
+            const username = ui.username.value.trim();
+            const password = ui.password.value;
+
+            if (mode === 'setup' && password !== ui.confirm.value) {
+                showError('Passwords do not match.');
+                return;
+            }
+
+            ui.btn.disabled = true;
+            try {
+                if (mode === 'setup') await API.setup(username, password);
+                else await API.login(username, password);
+                window.location.replace('index.html'); // button stays disabled while we leave
+            } catch (err) {
+                showError(err.message);
+                ui.password.value = '';
+                ui.confirm.value = '';
+                ui.password.focus();
+                ui.btn.disabled = false;
+            }
+        });
+
+        // Already logged in? Go straight to the app. No admin yet? Show setup.
+        (async function init() {
+            try {
+                const session = await API.session();
+                if (session.loggedIn) {
+                    window.location.replace('index.html');
+                    return;
+                }
+                setMode(session.needsSetup ? 'setup' : 'login');
+            } catch (err) {
+                showError(err.message);
+            }
+        })();
+    </script>
+</body>
+</html>
